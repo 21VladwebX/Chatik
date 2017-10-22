@@ -14,10 +14,18 @@
   "author": "Vlad B.",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.5.0",
+    "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "lodash": "^4.17.4",
     "mongoose": "^4.12.3",
     "nunjucks": "^3.0.1",
+    "passport": "^0.4.0",
+    "passport-jwt": "^3.0.0",
     "socket.io": "^2.0.3"
   }
 }

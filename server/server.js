@@ -5,30 +5,46 @@ const express = require('express'),
      server = require('http').Server(app),
      io = require('socket.io')(server, {serveClient: true}), //serverClient - будет ли храниться на нашем веб сервере храниться soket.io то-есть усть сокети для фронт и бєк енда, и чтобы они обновлялись синхронно
      mongoose = require('mongoose'),
+     passport = require('passport'),
+     bodyParser = require('body-parser'),
+     cookieParser = require('cookie-parser'),
      nunjucks = require('nunjucks');
+
+const { Strategy } = require('passport-jwt');
+
+const  { jwt } = require('./config');
+
+passport.use(new Strategy(jwt, function(jwt_payload, done) {    //1- откуда берем токен, 2- как проверють токен
+  if(jwt_payload != void(0)){                                   //проверка не равно ли нулю, вроде как такаю проверка происходит быстрее for object
+    return done(false, jwt_payload);
+  }
+  done();
+}));
 
 mongoose.connect('mongodb://localhost:27017/chat', {useMongoClient: true})//URI chat название колекции,
 
 mongoose.Promise  = require('bluebird');//bluebird - библиотека для Promise
 
+mongoose.set('debug', true);
+
 nunjucks.configure('../client/views',{ //client дириктория где храняться шаблоны
     autoescape: true,
     express: app
 });
+
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.json());
+app.use(cookieParser());
+
 /*---------------------------------------------*/
 
 app.use('/assets',express.static('../client/public')) // обьявляем статические файлы
 
-app.get('/',(req,res) =>{   //endpoint, callback
-  //res.sendFile('../client/index.html'); // не верный метод создания путей
-  // res.sendFile(path.join(__dirname,'..','client','index.html'))//path.join(__dirname - показывает путь к директории,подымаемся на папку выше,папка где файл, файл)
-  res.render('index.html',{//шаблон, значения которые можно юзать в шаблоне
-    date: new Date()
-  });
-});
 
 
-require('./sockets')(io);     //реквйрим файл, и передаем в него io
+require('./router')(app);
+
+require('./sockets')(io);     //реквeйрим файл, и передаем в него io
 
 
 
